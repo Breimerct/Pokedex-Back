@@ -67,7 +67,6 @@ export const getAboutPokemon = async (req: Request, res: Response) => {
             const pokemonSpecies: AxiosResponse = await httpClient.get('/pokemon-species/' + pokemonName)
             const genera: string                = pokemonSpecies.data.genera
                 .filter(val => val.language.name === 'en')[0].genus
-            const eggGroups: any[]              = pokemonSpecies.data.egg_groups.map(val => val.name)
             const flavorText: string            = pokemonSpecies.data.flavor_text_entries
                 .filter(
                     val =>
@@ -80,34 +79,17 @@ export const getAboutPokemon = async (req: Request, res: Response) => {
             const gender_rate: number           = pokemonSpecies.data.gender_rate
             const female: number                = gender_rate > -1 ? (gender_rate / 8) * 100 : 0
             const male: number                  = gender_rate > -1 ? 100 - female : 0
-            const pokemonUrl: string            = pokemonSpecies.data.varieties[0].pokemon.url
 
-            //Pokemon's details
-            const pokemon: AxiosResponse = await httpClient.get(pokemonUrl)
-            const abilities: any[]       = pokemon.data.abilities.map(val => (val.ability.name))
-            const types: any[]           = pokemon.data.types.map(val => (val.type.name))
-            const height: number         = pokemon.data.height / 10
-            const weight: number         = pokemon.data.weight / 10
-
-            if (
-                pokemonSpecies.status === 200 &&
-                pokemon.status === 200
-            ) {
+            if (pokemonSpecies.status === 200) {
                 res.send({
                     about: {
                         pokemonName   : pokemonSpecies.data.name,
                         description   : flavorText,
-                        eggGroups     : eggGroups,
-                        abilities     : abilities,
                         gendersPercent: {
                             female: female + '%',
                             male  : male + '%'
                         },
-                        img           : pokemon.data.sprites.other['official-artwork'].front_default,
-                        pokemonHeight : height + 'm',
-                        pokemonWeight : weight + 'kg',
                         genera        : genera,
-                        types         : types
                     }
                 })
             } else {
@@ -274,8 +256,8 @@ export const getPokemonVarieties = async (req: Request, res: Response) => {
                     types        : pokeVarieties.data.types.map(val => (val.type.name)),
                     eggGroups    : eggGroups,
                     abilities    : abilities,
-                    pokemonHeight: (pokeVarieties.data.height / 10) + 'm',
-                    pokemonWeight: (pokeVarieties.data.weight / 10) + 'kg',
+                    pokemonHeight: (pokeVarieties.data.height / 10) + ' m',
+                    pokemonWeight: (pokeVarieties.data.weight / 10) + ' kg',
                     url          : item.url
                 })
             }
